@@ -1,13 +1,9 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
+/** Uses react-native-mapbox-gl to display a map centered on Bridgetown, Barbados. 
+*   When pressed, displays the latitude, longitude of the pressed position.
+*/
 
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, ScrollView, View, Text, StatusBar } from 'react-native';
+import { StyleSheet, ScrollView, View, Text, StatusBar } from 'react-native';
 import MapboxGL from "@react-native-mapbox-gl/maps";
 
 MapboxGL.setAccessToken("pk.eyJ1Ijoid3JpdGUyayIsImEiOiJjazR4c2owa2owNDhwM2xtYm1obmVoMjNrIn0.sXOqGlRgdTmNV6nAlAX6WQ");
@@ -16,11 +12,16 @@ MapboxGL.setConnected(true);
 const App = () => {
 
   const map = React.createRef();
+  const textField = React.createRef();
   const [geolocation, setGeolocation] = useState('');
 
   const handlePress = (event) => {
     setGeolocation(event.geometry.coordinates[1] + ", " + event.geometry.coordinates[0]);
-    console.log('Target', event.geometry.coordinates)
+    textField.current.setNativeProps({
+      style: {
+        backgroundColor: "dodgerblue"
+      }
+    });
   }
 
   useEffect(() => {
@@ -30,35 +31,36 @@ const App = () => {
   return (
     <View style={styles.body}>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <View>
-            <Text style={styles.title}>My Map in React Native and MapBox</Text>
-          </View>
-          <View>
-            <Text style={styles.intro}>Makes use of react-native-mapbox-gl</Text>
-            <Text style={styles.data}>{geolocation}</Text>
-          </View>
-          <View style={styles.mapContainer}>
-            <MapboxGL.MapView 
-              ref={map}
-              style={styles.map}
-              attributionEnabled={true}
-              compassEnabled={true}
-              compassViewPosition={2}
-              onPress={handlePress}
-              styleURL={MapboxGL.StyleURL.SatelliteStreet}
-            >
-            <MapboxGL.Camera 
-              centerCoordinate={[-59.6132, 13.1060]}
-              zoomLevel={13}
-            />
-            </MapboxGL.MapView>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+      <View>
+        <Text style={styles.title}>My Map in React Native and MapBox</Text>
+      </View>
+      <View>
+        <Text style={styles.intro}>Makes use of react-native-mapbox-gl</Text>
+        {/* displays lat, lng of pressed position */}
+        <Text ref={textField} style={styles.data}>{geolocation}</Text> 
+      </View>
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        style={styles.scrollView}>
+
+        <View style={styles.mapContainer}>
+          <MapboxGL.MapView 
+            ref={map}
+            style={styles.map}
+            attributionEnabled={true}
+            compassEnabled={true}
+            compassViewPosition={2}
+            onPress={handlePress}
+            styleURL={MapboxGL.StyleURL.SatelliteStreet}
+          >
+          <MapboxGL.Camera 
+            centerCoordinate={[-59.6132, 13.1060]}
+            zoomLevel={13}
+          />
+          </MapboxGL.MapView>
+        </View>
+
+      </ScrollView>
     </View>
   );
 };
@@ -68,15 +70,19 @@ const styles = StyleSheet.create({
     
   },
   body: {
+    backgroundColor: "lemonchiffon",
     flex: 1,
     flexDirection: "column",
-    marginHorizontal: 20,
-    marginVertical: 40,
+    paddingHorizontal: 20,
+    paddingVertical: 40,
   },
   data: {
+    alignContent: "center",
+    borderRadius: 5,
     fontWeight: "bold",
-    paddingTop: 10,
-    textAlign: "center"
+    marginTop: 10,
+    paddingVertical: 5,
+    textAlign: "center",
   },
   intro: {
     fontStyle: "italic",
@@ -84,6 +90,8 @@ const styles = StyleSheet.create({
     paddingTop: 10
   },
   mapContainer: {
+    borderColor: "blue",
+    borderWidth: 2,
     marginTop: 20,
     backgroundColor: "black",
     height: 500
